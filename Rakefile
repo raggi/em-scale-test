@@ -21,7 +21,7 @@ task :limits do
   soft = limits[/soft\s+nofile\s+(\d+)/m, 1]
   hard = limits[/hard\s+nofile\s+(\d+)/m, 1]
   unless soft || hard
-    as_root('file_max')
+    as_root('limits')
     open('/etc/secuirty/limits.conf', 'a') do |f|
       f.puts
       f.puts desired
@@ -51,7 +51,7 @@ task :sysctl do
   maxfiles     = `sysctl kern.maxfiles`[/:\s*(\d+)/, 1].to_i
   maxfilesproc = `sysctl kern.maxfilesperproc`[/:\s*(\d+)/, 1].to_i
   unless maxfiles >= MAXFILES && maxfilesproc >= MAXFILES
-    as_root('file_max')
+    as_root('sysctl')
     sh "sysctl -w kern.maxfiles=#{MAXFILES}"
     sh "sysctl -w kern.maxfilesperproc=#{MAXFILES}"
   end
