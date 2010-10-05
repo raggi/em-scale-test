@@ -1,5 +1,26 @@
 #!/usr/bin/env rake
-MAXFILES = 100000
+MAXFILES = 65535
+
+task :limits do
+  desired =  <<-PLAIN
+  *       soft    nofile  1024
+  *       hard    nofile  65535
+  PLAIN
+  path = '/etc/security/limits.conf'
+  limits = File.read(path)
+  soft = limits[/soft\s+nofile\s+(\d+)/m, 1]
+  hard = limits[/hard\s+nofile\s+(\d+)/m, 1]
+  unless soft || hard
+    open('/etc/secuirty/limits.conf', 'a') do |f|
+      f.puts
+      f.puts desired
+    end
+  else
+    unless hard && hard.to_i >= MAXFILES
+      puts "Please setup the following entries in #{path}:\n#{desired}"
+    end
+  end
+end
 
 desc "set kernel maxfiles to #{MAXFILES}"
 task :sysctl do
@@ -9,7 +30,13 @@ end
 
 desc "set ulimit to #{MAXFILES}"
 task :ulimit do
-  sh "ulimit -n #{MAXFILES}"
+  case RUBY_PLATFORM
+  when /linux/
+    sh "ulimit -n unlimited"
+  else
+    # Assume broken ulimit implementation.
+    sh "ulimit -n #{MAXFILES}"
+  end
   sh "ulimit -n"
 end
 
