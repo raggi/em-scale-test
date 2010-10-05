@@ -25,6 +25,9 @@ task :limits do
   else
     unless hard && hard.to_i >= MAXFILES
       puts "Please setup the following entries in #{path}:\n#{desired}"
+    else
+      puts "hard: #{hard}"
+      puts "soft: #{soft}"
     end
   end
 end
