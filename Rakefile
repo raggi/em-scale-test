@@ -70,7 +70,7 @@ task :ulimit do
 end
 
 desc "start test"
-task :run => %w(ulimit) do
+task :run do
   ruby '-rubygems', 'conns.rb', MAXFILES.to_s
 end
 
