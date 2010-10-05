@@ -3,12 +3,6 @@ MAXFILES = 65535
 
 desc "setup limits.conf (requires sudo)"
 task :limits do
-  unless Process.euid == 0
-    cmd = ['sudo', __FILE__, 'limits']
-    puts cmd.join(' ')
-    exec *cmd
-  end
-
   desired =  <<-PLAIN
   *       soft    nofile  1024
   *       hard    nofile  65535
@@ -18,6 +12,12 @@ task :limits do
   soft = limits[/soft\s+nofile\s+(\d+)/m, 1]
   hard = limits[/hard\s+nofile\s+(\d+)/m, 1]
   unless soft || hard
+    unless Process.euid == 0
+      cmd = ['sudo', __FILE__, 'limits']
+      puts cmd.join(' ')
+      exec *cmd
+    end
+
     open('/etc/secuirty/limits.conf', 'a') do |f|
       f.puts
       f.puts desired
