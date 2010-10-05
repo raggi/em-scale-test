@@ -51,7 +51,7 @@ task :ulimit do
 end
 
 desc "start test"
-task :run => %w(sysctl ulimit) do
+task :run => %w(ulimit) do
   ruby '-rubygems', 'conns.rb', MAXFILES.to_s
 end
 
